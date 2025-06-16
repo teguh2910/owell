@@ -16,13 +16,14 @@ class Stock extends Model
         'in_process_stock',
         'process_status',
         'is_critical',
-        'estimated_depletion_date', // Tambahkan ini
+        'estimated_depletion_date',
+        'expired_date', // Tambahkan ini
     ];
 
-    // Opsional: Langsung cast ke tipe date.
     protected $casts = [
         'estimated_depletion_date' => 'date',
-        'is_critical' => 'boolean', // Ini juga bagus untuk tipe boolean
+        'expired_date' => 'date', // Tambahkan ini
+        'is_critical' => 'boolean',
     ];
 
     /**
