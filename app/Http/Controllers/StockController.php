@@ -42,6 +42,7 @@ class StockController extends Controller
             'ready_stock' => 'required|integer|min:0',
             'in_process_stock' => 'required|integer|min:0',
             'process_status' => 'nullable|string|max:255',
+            'expired_date' => 'nullable|date|after_or_equal:today', // Validasi tanggal kedaluwarsa
         ]);
 
         $stock = Stock::create($request->all());
@@ -77,6 +78,7 @@ class StockController extends Controller
             'ready_stock' => 'required|integer|min:0',
             'in_process_stock' => 'required|integer|min:0',
             'process_status' => 'nullable|string|max:255',
+            'expired_date' => 'nullable|date|after_or_equal:today', // Validasi tanggal kedaluwarsa
         ]);
 
         $stock->update($request->all());
