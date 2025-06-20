@@ -1,47 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kebutuhan Raw Material Bulanan</title>
-    <style>
-        body { font-family: sans-serif; margin: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        .alert { padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 20px; }
-        .alert-danger { color: #721c24; background-color: #f8d7da; border-color: #f5c6cb; padding: 10px; margin-bottom: 10px; border: 1px solid; border-radius: 4px; }
-        .btn { padding: 8px 12px; text-decoration: none; border-radius: 4px; cursor: pointer; }
-        .btn-primary { background-color: #007bff; color: white; border: none; }
-        .btn-warning { background-color: #ffc107; color: black; border: none; }
-        .btn-danger { background-color: #dc3545; color: white; border: none; }
-        .btn-group form { display: inline-block; margin-left: 5px; }
-    </style>
-</head>
-<body>
+@extends('layouts.app')
+
+@section('title', 'Kebutuhan Raw Material Bulanan')
+
+@section('content')
     <h1>Kebutuhan Raw Material Bulanan</h1>
 
-    @if (session('success'))
-        <div class="alert">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if (session('error'))
-        <div class="alert-danger">
-            {{ session('error') }}
-        </div>
-    @endif
-
-    <a href="{{ route('monthly_requirements.create') }}" class="btn btn-primary">Input Kebutuhan Baru</a>
+    <div style="margin-bottom: 20px;">
+        <a href="{{ route('monthly_requirements.create') }}" class="btn btn-primary">Input Kebutuhan Baru</a>
+        <a href="{{ route('monthly_requirements.import.form') }}" class="btn btn-primary"
+            style="background-color: #17a2b8; margin-left: 10px;">Import dari Excel</a>
+    </div>
 
     @if ($monthlyRequirements->isEmpty())
         <p>Belum ada data kebutuhan bulanan.</p>
     @else
-        <table>
+        <table id="monthlyRequirementsTable"> {{-- Tambahkan ID ini --}}
             <thead>
                 <tr>
-                    <th>ID</th>
                     <th>Raw Material</th>
                     <th>Tahun</th>
                     <th>Bulan</th>
@@ -56,21 +31,24 @@
             <tbody>
                 @foreach ($monthlyRequirements as $req)
                     <tr>
-                        <td>{{ $req->id }}</td>
-                        <td>{{ $req->rawMaterial->name }}</td> {{-- Mengakses nama dari relasi --}}
+                        <td>{{ $req->rawMaterial->name }}</td>
                         <td>{{ $req->year }}</td>
-                        <td>{{ date("F", mktime(0, 0, 0, $req->month, 1)) }}</td> {{-- Konversi angka bulan ke nama bulan --}}
+                        <td>{{ date('F', mktime(0, 0, 0, $req->month, 1)) }}</td>
                         <td>{{ $req->total_monthly_usage }}</td>
                         <td>{{ $req->weekly_usage_1 }}</td>
                         <td>{{ $req->weekly_usage_2 }}</td>
                         <td>{{ $req->weekly_usage_3 }}</td>
                         <td>{{ $req->weekly_usage_4 }}</td>
-                        <td class="btn-group">
-                            <a href="{{ route('monthly_requirements.edit', $req->id) }}" class="btn btn-warning">Edit</a>
-                            <form action="{{ route('monthly_requirements.destroy', $req->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
+                        <td class="btn-group" width="90px">
+                            {{-- Ikon Edit --}}
+                            <a href="{{ route('monthly_requirements.edit', $req->id) }}" class="btn btn-warning"
+                                title="Edit">✏️</a>
+                            {{-- Ikon Hapus --}}
+                            <form action="{{ route('monthly_requirements.destroy', $req->id) }}" method="POST"
+                                onsubmit="return confirm('Apakah Anda yakin ingin menghapus data ini?')">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="btn btn-danger">Hapus</button>
+                                <button type="submit" class="btn btn-danger" title="Hapus">🗑️</button>
                             </form>
                         </td>
                     </tr>
@@ -78,5 +56,13 @@
             </tbody>
         </table>
     @endif
-</body>
-</html>
+@endsection
+
+@push('scripts')
+    {{-- Tambahkan blok ini --}}
+    <script>
+        $(document).ready(function() {
+            $('#monthlyRequirementsTable').DataTable();
+        });
+    </script>
+@endpush

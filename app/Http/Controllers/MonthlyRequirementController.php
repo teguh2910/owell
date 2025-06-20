@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\MonthlyRequirement;
 use App\Models\RawMaterial; // Penting: Import model RawMaterial untuk dropdown
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel; // Import Facade Excel
+use App\Imports\MonthlyRequirementImport; // Import import class Anda
 
 class MonthlyRequirementController extends Controller
 {
@@ -152,5 +154,40 @@ class MonthlyRequirementController extends Controller
     {
         $monthlyRequirement->delete();
         return redirect()->route('monthly_requirements.index')->with('success', 'Kebutuhan bulanan berhasil dihapus!');
+    }
+     /**
+     * Show the form for uploading Excel file.
+     */
+    public function importForm()
+    {
+        return view('monthly_requirements.import');
+    }
+
+    /**
+     * Handle the Excel file upload and import.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048', // Validasi file harus excel dan ukuran max 2MB
+        ]);
+
+        try {
+            // Lakukan impor
+            Excel::import(new MonthlyRequirementImport, $request->file('file'));
+
+            return redirect()->route('monthly_requirements.index')->with('success', 'Data kebutuhan bulanan berhasil diimpor dari Excel!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            foreach ($failures as $failure) {
+                // Baris mana yang error, atribut apa, dan pesan errornya
+                $errors[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            // Kirimkan error kembali ke view
+            return redirect()->back()->withErrors(['excel_errors' => $errors]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+        }
     }
 }

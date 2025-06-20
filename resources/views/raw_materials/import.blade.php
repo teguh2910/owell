@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Master Data Raw Material</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+
+        form {
+            margin-top: 20px;
+        }
+
+        div {
+            margin-bottom: 10px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="file"] {
+            border: 1px solid #ddd;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        button {
+            padding: 10px 15px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #218838;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid;
+            border-radius: 4px;
+        }
+
+        .alert-error {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid;
+            border-radius: 4px;
+        }
+
+        ul {
+            margin-top: 0;
+            padding-left: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Import Master Data Raw Material dari Excel</h1>
+
+    @if (session('success'))
+        <div class="alert">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if (session('error'))
+        <div class="alert-error">
+            {{ session('error') }}
+        </div>
+    @endif
+
+    @if ($errors->any())
+        <div class="alert-danger">
+            <strong>Terjadi kesalahan validasi atau impor:</strong>
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+                @if ($errors->has('excel_errors'))
+                    @foreach ($errors->get('excel_errors') as $excelError)
+                        <li>{{ $excelError }}</li>
+                    @endforeach
+                @endif
+            </ul>
+        </div>
+    @endif
+
+    <form action="{{ route('raw_materials.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <div>
+            <label for="file">Pilih File Excel (.xlsx, .xls):</label>
+            <input type="file" id="file" name="file" accept=".xlsx, .xls" required>
+        </div>
+        <button type="submit">Import Data</button>
+        <a href="{{ route('raw_materials.index') }}" style="margin-left: 10px;">Kembali ke Daftar Raw Material</a>
+    </form>
+
+    <h3 style="margin-top: 30px;">Format File Excel:</h3>
+    <p>Pastikan file Excel Anda hanya memiliki satu kolom dengan nama persis seperti di bawah (case-insensitive):</p>
+    <ul>
+        <li>`nama_raw_material`</li>
+    </ul>
+    <p>Contoh isi file Excel (tanpa kolom ID, hanya header baris pertama):</p>
+    <pre>
+| nama_raw_material |
+|-------------------|
+| Kain Katun        |
+| Benang Polyester  |
+| Kancing Plastik   |
+    </pre>
+</body>
+
+</html>

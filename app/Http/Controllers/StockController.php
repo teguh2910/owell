@@ -7,6 +7,8 @@ use App\Models\RawMaterial; // Penting: Import model RawMaterial
 use App\Models\MonthlyRequirement; // Import model MonthlyRequirement
 use Illuminate\Http\Request;
 use Carbon\Carbon; // Untuk bekerja dengan tanggal dan minggu
+use Maatwebsite\Excel\Facades\Excel; // Import Facade Excel
+use App\Imports\StockImport; // Import import class Anda
 
 class StockController extends Controller
 {
@@ -16,7 +18,10 @@ class StockController extends Controller
     public function index()
     {
         // Mengambil semua data stok beserta nama raw materialnya
-        $stocks = Stock::with('rawMaterial')->get();
+        // Urutkan berdasarkan estimated_depletion_date, nulls last (yang tidak ada estimasi akan ditaruh di akhir)
+        $stocks = Stock::with('rawMaterial')
+                        ->orderByRaw('CASE WHEN estimated_depletion_date IS NULL THEN 1 ELSE 0 END, estimated_depletion_date ASC')
+                        ->get();
         return view('stocks.index', compact('stocks'));
     }
 
@@ -217,5 +222,41 @@ class StockController extends Controller
             'is_critical' => $isCritical,
             'estimated_depletion_date' => $estimatedDepletionDate,
         ]);
-    }    
+    } 
+    /**
+     * Show the form for uploading Excel file for Stocks.
+     */
+    public function importForm()
+    {
+        return view('stocks.import');
+    }
+
+    /**
+     * Handle the Excel file upload and import for Stocks.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048', // Validasi file harus excel dan ukuran max 2MB
+        ]);
+
+        try {
+            // Lakukan impor
+            Excel::import(new StockImport, $request->file('file'));
+
+            // Setelah semua stok diimpor/diperbarui, refresh semua status kritis dan estimasi habis
+            $this->refreshAllStockStatus(); // Memanggil method yang sudah ada
+
+            return redirect()->route('stocks.index')->with('success', 'Data stok berhasil diimpor dari Excel!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            return redirect()->back()->withErrors(['excel_errors' => $errors]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+        }
+    }   
 }

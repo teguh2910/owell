@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\RawMaterial;
 use Illuminate\Http\Request;
+use Maatwebsite\Excel\Facades\Excel; // Import Facade Excel
+use App\Imports\RawMaterialImport; // Import import class Anda
 
 class RawMaterialController extends Controller
 {
@@ -89,5 +91,38 @@ class RawMaterialController extends Controller
 
         // Redirect kembali ke halaman index dengan pesan sukses
         return redirect()->route('raw_materials.index')->with('success', 'Raw Material berhasil dihapus!');
+    }
+    /**
+     * Show the form for uploading Excel file for Raw Materials.
+     */
+    public function importForm()
+    {
+        return view('raw_materials.import');
+    }
+
+    /**
+     * Handle the Excel file upload and import for Raw Materials.
+     */
+    public function import(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls|max:2048', // Validasi file harus excel dan ukuran max 2MB
+        ]);
+
+        try {
+            // Lakukan impor
+            Excel::import(new RawMaterialImport, $request->file('file'));
+
+            return redirect()->route('raw_materials.index')->with('success', 'Master data Raw Material berhasil diimpor dari Excel!');
+        } catch (\Maatwebsite\Excel\Validators\ValidationException $e) {
+            $failures = $e->failures();
+            $errors = [];
+            foreach ($failures as $failure) {
+                $errors[] = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+            }
+            return redirect()->back()->withErrors(['excel_errors' => $errors]);
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat mengimpor file: ' . $e->getMessage());
+        }
     }
 }
