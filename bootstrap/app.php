@@ -17,13 +17,6 @@ return Application::configure(basePath: dirname(__DIR__))
             'role' => \App\Http\Middleware\RoleMiddleware::class,
         ]);
     })
-    // --- Tambahkan definisi scheduler di sini ---
-    ->withSchedule(function (Schedule $schedule) {
-        // Jadwalkan reminder stok kritis setiap hari jam 8 pagi
-        // Ganti 'YOUR_GROUP_JID' dengan ID JID grup WhatsApp Anda
-        $schedule->command('reminder:critical-stock --group-id="120363401195590086@g.us"')->dailyAt('08:00'); // Gunakan JID yang Anda berikan
-    })
-    // ------------------------------------------
     ->withExceptions(function (Exceptions $exceptions): void {
         //
     })->create();
