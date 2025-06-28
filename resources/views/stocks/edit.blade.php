@@ -98,6 +98,10 @@
             <input type="date" id="expired_date" name="expired_date"
                 value="{{ old('expired_date', $stock->expired_date ? $stock->expired_date->format('Y-m-d') : '') }}">
         </div>
+        <div>
+            <label for="aiia_stock">Stok AiiA:</label> 
+            <input type="number" id="aiia_stock" name="aiia_stock" value="{{ old('aiia_stock', $stock->aiia_stock) }}" min="0" required> 
+        </div>
         <button type="submit" class="btn-update">Update Stok</button>
         <a href="{{ route('stocks.index') }}" style="margin-left: 10px;">Kembali ke Daftar</a>
     </form>

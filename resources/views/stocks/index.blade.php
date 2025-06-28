@@ -28,6 +28,7 @@
                     <th>Status Proses</th>
                     <th>Estimasi Habis</th>
                     <th>Kedaluwarsa</th>
+                    <th>Stok AiiA</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -52,6 +53,7 @@
                                 -
                             @endif
                         </td>
+                        <td>{{ $stock->aiia_stock }}</td>
                         <td class="btn-group" width="90px">
                             {{-- Ikon Detail --}}
                             {{-- Ikon Edit/Update --}}

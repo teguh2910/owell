@@ -113,6 +113,10 @@
                 <label for="expired_date">Tanggal Kedaluwarsa (Opsional):</label>
                 <input type="date" id="expired_date" name="expired_date" value="{{ old('expired_date') }}">
             </div>
+            <div>
+                <label for="aiia_stock">Stok AiiA:</label> 
+                <input type="number" id="aiia_stock" name="aiia_stock" value="{{ old('aiia_stock', 0) }}" min="0" required> 
+            </div>
             <button type="submit">Simpan Stok</button>
         @endif
         <a href="{{ route('stocks.index') }}" style="margin-left: 10px;">Kembali ke Daftar</a>
