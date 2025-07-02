@@ -18,6 +18,7 @@ class Stock extends Model
         'is_critical',
         'estimated_depletion_date',
         'expired_date', // Tambahkan ini
+        'aiia_stock', // Tambahkan ini
     ];
 
     protected $casts = [

@@ -28,6 +28,7 @@
                     <th>Status Proses</th>
                     <th>Estimasi Habis</th>
                     <th>Kedaluwarsa</th>
+                    <th>Stok AiiA</th>
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -52,6 +53,7 @@
                                 -
                             @endif
                         </td>
+                        <td>{{ $stock->aiia_stock }}</td>
                         <td class="btn-group" width="90px">
                             {{-- Ikon Detail --}}
                             {{-- Ikon Edit/Update --}}
@@ -78,9 +80,7 @@
             $('#stocksTable').DataTable({
                 // Kolom Estimasi Habis berada pada indeks ke-5 (0-indexed)
                 // Kolom: 0:ID, 1:Raw Material, 2:Stok Ready, 3:Stok Dalam Proses, 4:Status Proses, 5:Estimasi Habis, 6:Kedaluwarsa, 7:Aksi
-                "order": [
-                    [5, "asc"]
-                ]
+                "order": []
             });
         });
     </script>
