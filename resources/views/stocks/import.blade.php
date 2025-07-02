@@ -125,9 +125,9 @@
     <pre>
 | nama_raw_material | ready_stock | in_process_stock | process_status     | expired_date |
 |-------------------|-------------|------------------|--------------------|--------------|
-| Kain Katun        | 500         | 100              | Dalam Pengiriman   | 2026-06-30   |
-| Benang Polyester  | 200         | 50               | Menunggu QC        |              |
-| Kancing Plastik   | 1000        | 0                |                    | 2025-12-31   |
+| ZZY               | 500         | 100              | CA1                | 2026-06-30   |
+| WBY               | 200         | 50               | CA2                |              |
+| 1D6               | 1000        | 0                | Filling            | 2025-12-31   |
     </pre>
 </body>
 

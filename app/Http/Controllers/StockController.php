@@ -12,6 +12,7 @@ use App\Imports\StockImport; // Import import class Anda
 
 class StockController extends Controller
 {
+    
     /**
      * Display a listing of the resource (Menampilkan daftar stok raw material).
      */

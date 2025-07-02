@@ -121,9 +121,9 @@
     <pre>
 | nama_raw_material |
 |-------------------|
-| Kain Katun        |
-| Benang Polyester  |
-| Kancing Plastik   |
+| WBY               |
+| ZZY               |
+| 1D6               |
     </pre>
 </body>
 

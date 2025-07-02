@@ -40,13 +40,13 @@ Route::middleware('auth')->group(function () {
 
     // --- RUTE MASTER DATA RAW MATERIAL ---
     // Semua role (Admin, PPIC, Supplier) bisa melihat daftar dan detail Raw Material
-    Route::middleware('role:admin,ppic,supplier')->group(function () {
+    Route::middleware('role:admin,ppic')->group(function () {
         Route::get('raw_materials', [RawMaterialController::class, 'index'])->name('raw_materials.index');
-        Route::get('raw_materials/{raw_material}', [RawMaterialController::class, 'show'])->name('raw_materials.show');
+        //Route::get('raw_materials/{raw_material}', [RawMaterialController::class, 'show'])->name('raw_materials.show');
     });
 
     // Hanya Admin yang bisa CRUD dan import Master Data Raw Material
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:admin,ppic')->group(function () {
         Route::get('raw_materials/create', [RawMaterialController::class, 'create'])->name('raw_materials.create');
         Route::post('raw_materials', [RawMaterialController::class, 'store'])->name('raw_materials.store');
         Route::get('raw_materials/{raw_material}/edit', [RawMaterialController::class, 'edit'])->name('raw_materials.edit');
@@ -77,13 +77,13 @@ Route::middleware('auth')->group(function () {
     });
 
     // Admin dan PPIC bisa import data Stok
-    Route::middleware('role:admin,ppic')->group(function () {
+    Route::middleware('role:admin,supplier')->group(function () {
         Route::get('stocks/import/form', [StockController::class, 'importForm'])->name('stocks.import.form');
         Route::post('stocks/import', [StockController::class, 'import'])->name('stocks.import');
     });
 
     // Hanya Admin yang bisa membuat (create/store) atau menghapus (destroy) data Stok
-    Route::middleware('role:admin')->group(function () {
+    Route::middleware('role:admin,supplier')->group(function () {
         Route::get('stocks/create', [StockController::class, 'create'])->name('stocks.create');
         Route::post('stocks', [StockController::class, 'store'])->name('stocks.store');
         Route::delete('stocks/{stock}', [StockController::class, 'destroy'])->name('stocks.destroy');

@@ -151,11 +151,33 @@
         <h1>Management Stock Owell</h1>
         <nav>
             <ul>
-                <li><a href="{{ route('raw_materials.index') }}">Master Raw Material</a></li>
-                <li><a href="{{ route('monthly_requirements.index') }}">Kebutuhan Bulanan</a></li>
-                <li><a href="{{ route('stocks.index') }}">Manajemen Stok</a></li>
+                {{-- Navigasi Utama --}}
+                @if (Auth::user()->role == 'admin' || Auth::user()->role == 'ppic')
+                    <li><a href="{{ route('raw_materials.index') }}">Master Raw Material</a></li>
+                @endif
+
+                @if (Auth::user()->role == 'admin' || Auth::user()->role == 'ppic')
+                    <li><a href="{{ route('monthly_requirements.index') }}">Kebutuhan Bulanan</a></li>
+                @endif
+
+                @if (Auth::user()->role == 'admin' || Auth::user()->role == 'ppic' || Auth::user()->role == 'supplier')
+                    <li><a href="{{ route('stocks.index') }}">Manajemen Stok</a></li>
+                @endif
+
             </ul>
+
         </nav>
+        <div class="user-info">
+            @auth
+                <span>Selamat datang, {{ Auth::user()->name }} ({{ Auth::user()->role }})</span>
+                <form method="POST" action="{{ route('logout') }}">
+                    @csrf
+                    <button type="submit">Logout</button> {{-- Tombol Logout saat ini --}}
+                </form>
+            @else
+                <a href="{{ route('login') }}" style="color: white; text-decoration: none;">Login</a>
+            @endauth
+        </div>
     </header>
 
     <div class="container">
