@@ -20,11 +20,11 @@
                     <th>Raw Material</th>
                     <th>Tahun</th>
                     <th>Bulan</th>
-                    <th>Total Bulanan</th>
-                    <th>Minggu 1</th>
-                    <th>Minggu 2</th>
-                    <th>Minggu 3</th>
-                    <th>Minggu 4</th>
+                    <th>Total Bulanan(Kg)</th>
+                    <th>Minggu 1(Kg)</th>
+                    <th>Minggu 2(Kg)</th>
+                    <th>Minggu 3(Kg)</th>
+                    <th>Minggu 4(Kg)</th>
                     <th>Aksi</th>
                 </tr>
             </thead>

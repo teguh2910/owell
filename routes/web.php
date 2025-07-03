@@ -29,13 +29,11 @@ Route::middleware('auth')->group(function () {
 
     // Dashboard Utama (Setelah Login)
     // Bisa diakses oleh Admin, PPIC, dan Supplier
-    Route::get('/', function () {
-        return view('dashboard');
-    })->middleware('role:admin,ppic,supplier')->name('dashboard');
-
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->middleware('role:admin,ppic,supplier');
+    Route::middleware('auth', 'role:admin,ppic,supplier')->group(function () {
+        // Ubah ini untuk memanggil DashboardController
+        Route::get('/', [\App\Http\Controllers\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('/dashboard', [\App\Http\Controllers\DashboardController::class, 'index']); // Arahkan /dashboard juga
+    });
 
 
     // --- RUTE MASTER DATA RAW MATERIAL ---
@@ -71,6 +69,7 @@ Route::middleware('auth')->group(function () {
     // Semua role (Admin, PPIC, Supplier) bisa melihat daftar Stok, edit/update Stok mereka, dan refresh semua status stok
     Route::middleware('role:admin,ppic,supplier')->group(function () {
         Route::get('stocks', [StockController::class, 'index'])->name('stocks.index');
+        Route::get('stocks/{stock}/process-status', [StockController::class, 'showProcessStatus'])->name('stocks.show.process.status'); // <-- Tambahkan ini
         Route::get('stocks/{stock}/edit', [StockController::class, 'edit'])->name('stocks.edit');
         Route::put('stocks/{stock}', [StockController::class, 'update'])->name('stocks.update');
         Route::post('stocks/refresh-all', [StockController::class, 'refreshAllStockStatus'])->name('stocks.refresh.all');

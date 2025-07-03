@@ -14,22 +14,22 @@ class Stock extends Model
         'raw_material_id',
         'ready_stock',
         'in_process_stock',
-        'process_status',
+        // 'process_status', // Hapus ini jika Anda menghapusnya di migrasi
+        'kansai_process_status', // Tambahkan ini
+        'owell_process_status',  // Tambahkan ini
+        'qa_aiia_process_status',// Tambahkan ini
         'is_critical',
         'estimated_depletion_date',
-        'expired_date', // Tambahkan ini
-        'aiia_stock', // Tambahkan ini
+        'expired_date',
+        'aiia_stock',
     ];
 
     protected $casts = [
         'estimated_depletion_date' => 'date',
-        'expired_date' => 'date', // Tambahkan ini
+        'expired_date' => 'date',
         'is_critical' => 'boolean',
     ];
 
-    /**
-     * Get the raw material that owns the stock.
-     */
     public function rawMaterial(): BelongsTo
     {
         return $this->belongsTo(RawMaterial::class);

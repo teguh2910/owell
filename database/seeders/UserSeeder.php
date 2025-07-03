@@ -17,7 +17,7 @@ class UserSeeder extends Seeder
         // User Admin
         User::create([
             'name' => 'Admin User',
-            'email' => 'admin@example.com',
+            'email' => 'admin@aisin.com',
             'password' => Hash::make('password'), // Ganti dengan password yang kuat di produksi
             'role' => 'admin',
             'email_verified_at' => now(), // Verifikasi email secara otomatis untuk seeder
@@ -26,7 +26,7 @@ class UserSeeder extends Seeder
         // User PPIC
         User::create([
             'name' => 'PPIC User',
-            'email' => 'ppic@example.com',
+            'email' => 'ppic@aisin.com',
             'password' => Hash::make('password'),
             'role' => 'ppic',
             'email_verified_at' => now(),
@@ -35,9 +35,25 @@ class UserSeeder extends Seeder
         // User Supplier
         User::create([
             'name' => 'Supplier User',
-            'email' => 'supplier@example.com',
+            'email' => 'supplier@owell.com',
             'password' => Hash::make('password'),
-            'role' => 'supplier',
+            'role' => 'owell',
+            'email_verified_at' => now(),
+        ]);
+        // User Supplier
+        User::create([
+            'name' => 'Supplier User',
+            'email' => 'supplier@kansai.com',
+            'password' => Hash::make('password'),
+            'role' => 'kansai',
+            'email_verified_at' => now(),
+        ]);
+        // User QA
+        User::create([
+            'name' => 'QA User',
+            'email' => 'qa@aisin.com',
+            'password' => Hash::make('password'),
+            'role' => 'qa',
             'email_verified_at' => now(),
         ]);
 

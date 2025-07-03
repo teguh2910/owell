@@ -23,12 +23,15 @@
             <thead>
                 <tr>
                     <th>Raw Material</th>
-                    <th>Stok Ready</th>
-                    <th>Stok Dalam Proses</th>
-                    <th>Status Proses</th>
+                    <th>Average Usage/Mth(Kg)</th>
+                    <th>Owell Stok Ready(Kg)</th>
+                    <th>Stok Dalam Proses(Kansai)(Kg)</th>
+                    <th>Status Kansai</th> {{-- Tambahkan --}}
+                    <th>Status Owell</th> {{-- Tambahkan --}}
+                    <th>Status QA AiiA</th> {{-- Tambahkan --}}
                     <th>Estimasi Habis</th>
-                    <th>Kedaluwarsa</th>
-                    <th>Stok AiiA</th>
+                    <th>Expired</th>
+                    {{-- <th>Stok AiiA</th> --}}
                     <th>Aksi</th>
                 </tr>
             </thead>
@@ -36,9 +39,12 @@
                 @foreach ($stocks as $stock)
                     <tr class="{{ $stock->is_critical ? 'critical-stock' : '' }}">
                         <td>{{ $stock->rawMaterial->name }}</td>
+                        <td>{{ $stock->average_monthly_usage }}</td>
                         <td>{{ $stock->ready_stock }}</td>
                         <td>{{ $stock->in_process_stock }}</td>
-                        <td>{{ $stock->process_status ?? '-' }}</td>
+                        <td>{{ $stock->kansai_process_status ?? '-' }}</td> {{-- Tampilkan --}}
+                        <td>{{ $stock->owell_process_status ?? '-' }}</td> {{-- Tampilkan --}}
+                        <td>{{ $stock->qa_aiia_process_status ?? '-' }}</td> {{-- Tampilkan --}}
                         <td>
                             @if ($stock->estimated_depletion_date)
                                 {{ $stock->estimated_depletion_date->format('d M Y') }}
@@ -53,7 +59,7 @@
                                 -
                             @endif
                         </td>
-                        <td>{{ $stock->aiia_stock }}</td>
+                        {{-- <td>{{ $stock->aiia_stock }}</td> --}}
                         <td class="btn-group" width="90px">
                             {{-- Ikon Detail --}}
                             {{-- Ikon Edit/Update --}}

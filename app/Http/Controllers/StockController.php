@@ -9,20 +9,32 @@ use Illuminate\Http\Request;
 use Carbon\Carbon; // Untuk bekerja dengan tanggal dan minggu
 use Maatwebsite\Excel\Facades\Excel; // Import Facade Excel
 use App\Imports\StockImport; // Import import class Anda
+use Illuminate\Support\Facades\Auth; // Import Auth
 
 class StockController extends Controller
-{
-    
-    /**
+{    
+   /**
      * Display a listing of the resource (Menampilkan daftar stok raw material).
      */
     public function index()
     {
         // Mengambil semua data stok beserta nama raw materialnya
-        // Urutkan berdasarkan estimated_depletion_date, nulls last (yang tidak ada estimasi akan ditaruh di akhir)
         $stocks = Stock::with('rawMaterial')
                         ->orderByRaw('CASE WHEN estimated_depletion_date IS NULL THEN 1 ELSE 0 END, estimated_depletion_date ASC')
                         ->get();
+
+        // --- HITUNG RATA-RATA KEBUTUHAN BULANAN ---
+        // Untuk setiap stok, kita akan menghitung rata-rata kebutuhan bulanan
+        // dari semua entri MonthlyRequirement yang ada untuk raw material tersebut.
+        $stocks->each(function ($stock) {
+            $averageUsage = MonthlyRequirement::where('raw_material_id', $stock->raw_material_id)
+                                            ->avg('total_monthly_usage'); // Menggunakan fungsi AVG SQL
+
+            // Tambahkan sebagai properti dinamis ke objek stock
+            $stock->average_monthly_usage = round($averageUsage ?? 0, 2); // default 0 jika tidak ada data, bulatkan 2 desimal
+        });
+        // --- AKHIR PERHITUNGAN RATA-RATA ---
+
         return view('stocks.index', compact('stocks'));
     }
 
@@ -37,7 +49,10 @@ class StockController extends Controller
         $rawMaterials = RawMaterial::whereDoesntHave('stock')->get();
         return view('stocks.create', compact('rawMaterials'));
     }
-
+    public function showProcessStatus(Stock $stock)
+    {
+        return view('stocks.process_status_detail', compact('stock'));
+    }
     /**
      * Store a newly created resource in storage (Menyimpan data stok baru).
      */
@@ -81,18 +96,57 @@ class StockController extends Controller
      */
     public function update(Request $request, Stock $stock)
     {
-        $request->validate([
+        $userRole = Auth::user()->role;
+        $rules = [
             'ready_stock' => 'required|integer|min:0',
             'in_process_stock' => 'required|integer|min:0',
-            'process_status' => 'nullable|string|max:255',
-            'expired_date' => 'nullable|date|after_or_equal:today', 
-            'aiia_stock' => 'required|integer|min:0',// Validasi tanggal kedaluwarsa
-        ]);
+            'expired_date' => 'nullable|date|after_or_equal:today',
+            'aiia_stock' => 'required|integer|min:0',
+            // 'process_status' => 'nullable|string|max:255', // Hapus jika sudah dihapus di migrasi
+        ];
+        $dataToUpdate = $request->only(['ready_stock', 'in_process_stock', 'expired_date', 'aiia_stock']);
 
-        $stock->update($request->all());
-        // Setelah stok diperbarui, panggil logika pengecekan kritis
-        $this->checkCriticalStock($stock);
-        return redirect()->route('stocks.index')->with('success', 'Data stok berhasil diperbarui!');
+        // --- Aturan Validasi dan Data Update berdasarkan Role ---
+        if ($userRole == 'supplier' || $userRole == 'admin') {
+            $rules['kansai_process_status'] = 'nullable|string|max:255';
+            $dataToUpdate['kansai_process_status'] = $request->input('kansai_process_status');
+
+            $rules['owell_process_status'] = 'nullable|string|max:255';
+            $dataToUpdate['owell_process_status'] = $request->input('owell_process_status');
+        }
+
+        if ($userRole == 'ppic' || $userRole == 'admin') {
+            // PPIC dan Admin juga bisa update status Owell
+            // Jika Owell hanya oleh Supplier/Admin, hapus dari PPIC
+            $rules['owell_process_status'] = 'nullable|string|max:255'; // Duplikasi tidak masalah
+            $dataToUpdate['owell_process_status'] = $request->input('owell_process_status');
+        }
+
+        if ($userRole == 'admin') {
+            // Admin bisa update semua, termasuk QA AiiA
+            $rules['qa_aiia_process_status'] = 'nullable|string|max:255';
+            $dataToUpdate['qa_aiia_process_status'] = $request->input('qa_aiia_process_status');
+        }
+
+        // Contoh: Jika user "QA AiiA" adalah role terpisah
+        // if ($userRole == 'qa_aiia_role_baru') {
+        //     $rules['qa_aiia_process_status'] = 'nullable|string|max:255';
+        //     $dataToUpdate['qa_aiia_process_status'] = $request->input('qa_aiia_process_status');
+        // }
+
+
+        $request->validate($rules); // Jalankan validasi
+
+        $stock->update($dataToUpdate); // Update hanya data yang diizinkan
+
+        // Jika Anda mempertahankan kolom process_status lama sebagai ringkasan,
+        // Anda perlu logik untuk menggabungkannya di sini.
+        // Contoh: $stock->process_status = $request->input('kansai_process_status') . ' - ' . $request->input('owell_process_status');
+        // $stock->save();
+
+        $this->checkCriticalStock($stock); // Panggil pengecekan kritis
+
+        return redirect()->route('stocks.index')->with('success', 'Status stok berhasil diperbarui!');
     }
 
     /**
@@ -201,7 +255,7 @@ class StockController extends Controller
 
         // Logika Peringatan Kritis:
         // Stok kritis jika ada estimatedDepletionDate DAN tanggalnya kurang dari atau sama dengan 1 bulan dari sekarang
-        $oneMonthFromNow = $today->copy()->addMonth(); // 1 bulan dari sekarang
+        $oneMonthFromNow = $today->copy()->addMonth(2); // 2 bulan dari sekarang
 
         if ($estimatedDepletionDate) {
             // Jika ada estimasi tanggal habis, cek apakah tanggal tersebut <= 1 bulan dari sekarang

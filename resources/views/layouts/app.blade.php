@@ -141,6 +141,29 @@
             display: inline-block;
             margin-left: 5px;
         }
+
+        /* Gaya untuk layout chart */
+        .dashboard-charts-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-top: 40px;
+            justify-content: center;
+            /* Untuk menempatkan di tengah jika hanya ada satu baris */
+        }
+
+        .dashboard-chart-card {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            flex: 1 1 calc(50% - 20px);
+            /* Untuk 2 kolom */
+            min-width: 300px;
+            /* Batasan lebar minimum agar tidak terlalu kecil */
+            box-sizing: border-box;
+            /* Penting untuk perhitungan width dengan padding/border */
+        }
     </style>
 
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css">
@@ -148,7 +171,7 @@
 
 <body>
     <header>
-        <h1>Management Stock Owell</h1>
+        <h1><a href="{{ asset('dashboard') }}">Management Stock Owell</a></h1>
         <nav>
             <ul>
                 {{-- Navigasi Utama --}}
@@ -214,6 +237,7 @@
 
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script> {{-- TAMBAHKAN BARIS INI --}}
     @stack('scripts') {{-- Ini penting untuk script halaman spesifik --}}
 </body>
 
